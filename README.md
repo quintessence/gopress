@@ -1,4 +1,4 @@
 gopress
 =======
 
-Go app based on egonSchiele's mdpress
+Go app based on [mdpress](https://github.com/egonSchiele/mdpress)
