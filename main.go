@@ -5,6 +5,7 @@ import (
   "os/exec"
   "flag"
   "fmt"
+  "os"
 )
 
 func main(){
@@ -16,13 +17,33 @@ func main(){
  
   flag.Parse()
 
+  if _, err := os.Stat(sourceFile); os.IsNotExist(err) {
+    fmt.Printf("No such file or directory: %s\nExiting program.\n", sourceFile)
+    return
+  }
+
+  if _, err := os.Stat(destinationDir); os.IsNotExist(err) {
+    fmt.Printf("No such directory, creating new directory: %s\n", destinationDir)
+    mkdirCommand := exec.Command("mkdir", destinationDir)
+    mkdirErr := mkdirCommand.Run()
+    if mkdirErr != nil {
+      output, _ := mkdirCommand.Output()
+      println(output)
+      fmt.Printf("Could not create new directory.\nExiting program.\n")
+      return
+    }
+    fmt.Printf("Successfully created new directory.\n")
+  }
+
   copyCommand := exec.Command("cp", "-rf", sourceFile, destinationDir)
-  err := copyCommand.Run()
+  cpErr := copyCommand.Run()
   
-  if err != nil {
+  if cpErr != nil {
    output, _ := copyCommand.Output()
    println(output)
-   fmt.Println("sourcefile: ", sourceFile)
-   fmt.Println("destDir: ", destinationDir)
+   fmt.Printf("Could not copy files.\nExiting program.\n")
   }
+
+  fmt.Printf("Successfully copied files.\nExiting.\n")
+
 }
