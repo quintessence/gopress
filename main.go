@@ -6,6 +6,7 @@ import (
   "flag"
   "fmt"
   "os"
+  "strings"
 )
 
 func main(){
@@ -20,7 +21,8 @@ func main(){
   flag.Parse()
 
   if destinationDir == "" {
-    destinationDir = "."
+    inputPathArray := strings.Split(sourceFile, "/")
+    destinationDir = strings.Split(inputPathArray[len(inputPathArray)-1], ".")[0]
   }
 
   if _, err := os.Stat(sourceFile); os.IsNotExist(err) {
@@ -53,5 +55,6 @@ func main(){
   fmt.Printf("Successfully copied files.\nExiting.\n")
 
   fmt.Println("Value of v: ", verboseMode)
+  fmt.Printf("%q\n", strings.Split(sourceFile, "/"))
 
 }
