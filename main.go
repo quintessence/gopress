@@ -11,11 +11,17 @@ import (
 func main(){
   var sourceFile string
   var destinationDir string
+  var verboseMode bool
 
   flag.StringVar(&sourceFile, "inputFile", "", "File to be converted to HTML presentation")
   flag.StringVar(&destinationDir, "outputDir", "", "Directory where HTML presentation will be written")
- 
+  flag.BoolVar(&verboseMode, "v", false, "Verbose mode prints progress messages to screen")
+
   flag.Parse()
+
+  if destinationDir == "" {
+    destinationDir = "."
+  }
 
   if _, err := os.Stat(sourceFile); os.IsNotExist(err) {
     fmt.Printf("No such file or directory: %s\nExiting program.\n", sourceFile)
@@ -45,5 +51,7 @@ func main(){
   }
 
   fmt.Printf("Successfully copied files.\nExiting.\n")
+
+  fmt.Println("Value of v: ", verboseMode)
 
 }
