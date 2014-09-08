@@ -25,6 +25,12 @@ func fileOrDirectoryDoesNotExist(inputPath string) bool {
   return false
 }
 
+func verbosePrint(msgToPrint string, verbose bool) {
+  if verbose {
+    fmt.Printf(msgToPrint)
+  }
+}
+
 func main(){
   var sourceFile string
   var destinationDir string
@@ -39,38 +45,30 @@ func main(){
   flag.Parse()
 
   if fileOrDirectoryDoesNotExist(sourceFile){ 
-    if verboseMode {
-      fmt.Printf("No such file or directory: %s\nExiting program.\n", sourceFile)
-    }
+    verbosePrint("Input file or directory does not exist: " + sourceFile + "\nExiting program.\n", verboseMode)
     return
   }
 
   destinationDir = updateDestinationDirPath(destinationDir, sourceFile, newDir)
 
   if fileOrDirectoryDoesNotExist(destinationDir){ 
-    if verboseMode {
-      fmt.Printf("No such directory, creating new directory: %s\n", destinationDir)
-    }
+    verbosePrint("No such directory, creating new directory: " + destinationDir + "\n", verboseMode)
     mkdirCommand := exec.Command("mkdir", destinationDir)
     mkdirErr := mkdirCommand.Run()
     if mkdirErr != nil {
-      output, _ := mkdirCommand.Output()
-      println(output)
-      fmt.Printf("Could not create new directory.\nExiting program.\n")
+      _, _ = mkdirCommand.Output()
+      verbosePrint("Could not create new directory.\nExiting program.\n", verboseMode)
       return
     }
-    fmt.Printf("Successfully created new directory.\n")
+    verbosePrint("Successfully created new directory.\n", verboseMode)
   }
 
   copyCommand := exec.Command("cp", "-rf", sourceFile, destinationDir)
   cpErr := copyCommand.Run()
   
   if cpErr != nil {
-   output, _ := copyCommand.Output()
-   println(output)
-   fmt.Printf("Could not copy files.\nExiting program.\n")
+   _, _ = copyCommand.Output()
+   verbosePrint("Could not copy files.\nExiting program.\n", verboseMode)
   }
-
-  fmt.Printf("Successfully copied files.\nExiting.\n")
-
+  verbosePrint("Successfully copied files.\nExiting program.\n", verboseMode)
 }
