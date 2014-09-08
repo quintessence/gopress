@@ -56,7 +56,6 @@ func main(){
     mkdirCommand := exec.Command("mkdir", destinationDir)
     mkdirErr := mkdirCommand.Run()
     if mkdirErr != nil {
-      _, _ = mkdirCommand.Output()
       verbosePrint("Could not create new directory.\nExiting program.\n", verboseMode)
       return
     }
@@ -67,7 +66,6 @@ func main(){
   cpErr := copyCommand.Run()
   
   if cpErr != nil {
-   _, _ = copyCommand.Output()
    verbosePrint("Could not copy files.\nExiting program.\n", verboseMode)
   }
   verbosePrint("Successfully copied files.\nExiting program.\n", verboseMode)
