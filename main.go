@@ -47,10 +47,11 @@ func main() {
 	flag.Parse()
 
 	logger := stdlog.GetFromFlags()
-	logger.Info("Testing gopress writes to stdout.")
+	logger.Info("Starting gopress")
 
 	if fileOrDirectoryDoesNotExist(sourceFile) {
 		verbosePrint("Input file or directory does not exist: "+sourceFile+"\nExiting program.\n", verboseMode)
+		logger.Errorf("Input file or directory does not exist: %s", sourceFile)
 		return
 	}
 
@@ -58,13 +59,17 @@ func main() {
 
 	if fileOrDirectoryDoesNotExist(destinationDir) {
 		verbosePrint("No such directory, creating new directory: "+destinationDir+"\n", verboseMode)
+		logger.Warningf("Output directory unspecified or does not exist, creating new directory: %s", destinationDir)
 		mkdirCommand := exec.Command("mkdir", destinationDir)
 		mkdirErr := mkdirCommand.Run()
 		if mkdirErr != nil {
 			verbosePrint("Could not create new directory.\nExiting program.\n", verboseMode)
+			logger.Errorf("Could not create new directory.")
+			logger.Info("Exiting gopress with errors")
 			return
 		}
 		verbosePrint("Successfully created new directory.\n", verboseMode)
+		logger.Info("Successfully created new directory.")
 	}
 
 	copyCommand := exec.Command("cp", "-rf", sourceFile, destinationDir)
@@ -72,6 +77,10 @@ func main() {
 
 	if cpErr != nil {
 		verbosePrint("Could not copy files.\nExiting program.\n", verboseMode)
+		logger.Errorf("Could not copy files.")
+		logger.Info("Exiting gopress with errors")
 	}
 	verbosePrint("Successfully copied files.\nExiting program.\n", verboseMode)
+	logger.Info("Successfully copied files.")
+	logger.Info("Exiting gopress")
 }
