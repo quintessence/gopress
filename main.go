@@ -7,6 +7,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"log"
+	"log/syslog"
 )
 
 func updateDestinationDirPath(currentDestDir string, currentInputFile string, newDirFlag bool) string {
@@ -43,6 +45,14 @@ func main() {
 	flag.BoolVar(&newDir, "newDir", false, "Creates a new directory named after the file")
 
 	flag.Parse()
+
+	logwriter, errLog := syslog.New(syslog.LOG_NOTICE, "gopress")
+	if errLog == nil {
+		log.SetOutput(logwriter)
+	}
+
+	log.Print("Testing that gopress is writing to logs.")
+
 
 	if fileOrDirectoryDoesNotExist(sourceFile) {
 		verbosePrint("Input file or directory does not exist: "+sourceFile+"\nExiting program.\n", verboseMode)
