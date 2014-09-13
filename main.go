@@ -10,6 +10,7 @@ import (
 
 	"github.com/alexcesaro/log/stdlog"
 	"github.com/russross/blackfriday"
+	"github.com/shurcooL/go/github_flavored_markdown"
 )
 
 func updateDestinationDirPath(currentDestDir string, currentInputFile string, newDirFlag bool) string {
@@ -90,6 +91,6 @@ func main() {
 		return
 	}
 	htmlOutput := blackfriday.MarkdownBasic(sourceFileRead)
-	fmt.Println(htmlOutput)
+	os.Stdout.Write(github_flavored_markdown.Markdown(htmlOutput))
 	logger.Info("Exiting gopress")
 }
