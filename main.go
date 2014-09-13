@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -90,7 +91,15 @@ func main() {
 		logger.Errorf("Could not read Markdown file.")
 		return
 	}
-	htmlOutput := blackfriday.MarkdownBasic(sourceFileRead)
-	os.Stdout.Write(github_flavored_markdown.Markdown(htmlOutput))
+
+	//Now for some Markdown/HTML
+	//Testing: https://github.com/shurcooL/go/blob/master/github_flavored_markdown/main_test.go
+	var writer io.Writer = os.Stdout
+	htmlBytes := blackfriday.MarkdownBasic(sourceFileRead)
+	writer.Write(github_flavored_markdown.Markdown(htmlBytes))
+	_, errorHTML := os.Stdout.Write(github_flavored_markdown.Markdown(htmlBytes))
+	if errorHTML != nil {
+		logger.Errorf("Could not convert to HTML: " + sourceFile)
+	}
 	logger.Info("Exiting gopress")
 }
