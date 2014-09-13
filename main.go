@@ -1,14 +1,15 @@
 package main
 
 import (
-	//  "github.com/russross/blackfriday"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
 
 	"github.com/alexcesaro/log/stdlog"
+	"github.com/russross/blackfriday"
 )
 
 func updateDestinationDirPath(currentDestDir string, currentInputFile string, newDirFlag bool) string {
@@ -82,5 +83,13 @@ func main() {
 	}
 	verbosePrint("Successfully copied files.\nExiting program.\n", verboseMode)
 	logger.Info("Successfully copied files.")
+
+	sourceFileRead, errorReadFile := ioutil.ReadFile(sourceFile)
+	if errorReadFile != nil {
+		logger.Errorf("Could not read Markdown file.")
+		return
+	}
+	htmlOutput := blackfriday.MarkdownBasic(sourceFileRead)
+	fmt.Println(htmlOutput)
 	logger.Info("Exiting gopress")
 }
