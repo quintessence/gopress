@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -92,14 +91,18 @@ func main() {
 		return
 	}
 
-	//Now for some Markdown/HTML
-	//Testing: https://github.com/shurcooL/go/blob/master/github_flavored_markdown/main_test.go
-	var writer io.Writer = os.Stdout
-	htmlBytes := blackfriday.MarkdownBasic(sourceFileRead)
-	writer.Write(github_flavored_markdown.Markdown(htmlBytes))
-	_, errorHTML := os.Stdout.Write(github_flavored_markdown.Markdown(htmlBytes))
+	outputFile := destinationDir + "/test.html"
+	fmt.Printf("The output file is: %s", outputFile)
+	htmlFile, errorCreatingFile := os.Create(outputFile)
+	if errorCreatingFile != nil {
+		logger.Errorf("Could not create file: ")
+	}
+	markdownToHTML := blackfriday.MarkdownBasic(sourceFileRead)
+	_, errorHTML := htmlFile.Write(github_flavored_markdown.Markdown(markdownToHTML))
 	if errorHTML != nil {
 		logger.Errorf("Could not convert to HTML: " + sourceFile)
 	}
+	defer htmlFile.Close()
+	htmlFile.Sync()
 	logger.Info("Exiting gopress")
 }
