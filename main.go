@@ -100,8 +100,11 @@ func main() {
 	if errorCreatingFile != nil {
 		logger.Errorf("Could not create file: ")
 	}
+
 	markdownToHTML := blackfriday.MarkdownBasic(sourceFileRead)
+	_, _ = htmlFile.WriteString("<html><body>\n")
 	_, errorHTML := htmlFile.Write(github_flavored_markdown.Markdown(markdownToHTML))
+	_, _ = htmlFile.WriteString("</body></html>")
 	if errorHTML != nil {
 		logger.Errorf("Could not convert to HTML: " + sourceFile)
 	}
