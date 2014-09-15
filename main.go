@@ -13,10 +13,14 @@ import (
 	"github.com/shurcooL/go/github_flavored_markdown"
 )
 
+func extractInputFilename(inputFile string) string {
+	inputPathArray := strings.Split(inputFile, "/")
+	return strings.Split(inputPathArray[len(inputPathArray)-1], ".")[0]
+}
+
 func updateDestinationDirPath(currentDestDir string, currentInputFile string, newDirFlag bool) string {
 	if currentDestDir == "" || newDirFlag {
-		inputPathArray := strings.Split(currentInputFile, "/")
-		return currentDestDir + strings.Split(inputPathArray[len(inputPathArray)-1], ".")[0]
+		return currentDestDir + extractInputFilename(currentInputFile)
 	}
 
 	return currentDestDir
@@ -91,8 +95,7 @@ func main() {
 		return
 	}
 
-	outputFile := destinationDir + "/test.html"
-	fmt.Printf("The output file is: %s", outputFile)
+	outputFile := destinationDir + "/" + extractInputFilename(sourceFile) + ".html"
 	htmlFile, errorCreatingFile := os.Create(outputFile)
 	if errorCreatingFile != nil {
 		logger.Errorf("Could not create file: ")
