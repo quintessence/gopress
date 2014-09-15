@@ -35,12 +35,10 @@ func fileOrDirectoryDoesNotExist(inputPath string) bool {
 func main() {
 	var sourceFile string
 	var destinationDir string
-	var verboseMode bool
 	var newDir bool
 
 	flag.StringVar(&sourceFile, "inputFile", "", "File to be converted to HTML presentation")
 	flag.StringVar(&destinationDir, "outputDir", "", "Directory where HTML presentation will be written")
-	flag.BoolVar(&verboseMode, "v", false, "Verbose mode prints progress messages to screen")
 	flag.BoolVar(&newDir, "newDir", false, "Creates a new directory named after the file")
 
 	logger := stdlog.GetFromFlags()
@@ -61,7 +59,7 @@ func main() {
 		mkdirCommand := exec.Command("mkdir", destinationDir)
 		mkdirErr := mkdirCommand.Run()
 		if mkdirErr != nil {
-			logger.Errorf("Could not create new directory.")
+			logger.Errorf("Could not create new directory: %s.", destinationDir)
 			logger.Info("Exiting gopress with errors")
 			return
 		}
@@ -72,21 +70,23 @@ func main() {
 	cpErr := copyCommand.Run()
 
 	if cpErr != nil {
-		logger.Errorf("Could not copy files.")
+		logger.Error("Could not copy files.")
 		logger.Info("Exiting gopress with errors")
 	}
 	logger.Info("Successfully copied files.")
 
 	sourceFileRead, errorReadFile := ioutil.ReadFile(sourceFile)
 	if errorReadFile != nil {
-		logger.Errorf("Could not read Markdown file.")
+		logger.Errorf("Could not read Markdown file: %s", sourceFile)
 		return
 	}
 
 	outputFile := destinationDir + "/" + extractInputFilename(sourceFile) + ".html"
 	htmlFile, errorCreatingFile := os.Create(outputFile)
 	if errorCreatingFile != nil {
-		logger.Errorf("Could not create file: ")
+		logger.Errorf("Could not create file: %s", outputFile)
+		logger.Info("Exiting gopress with errors")
+		return
 	}
 
 	markdownToHTML := blackfriday.MarkdownBasic(sourceFileRead)
@@ -94,8 +94,11 @@ func main() {
 	_, errorHTML := htmlFile.Write(github_flavored_markdown.Markdown(markdownToHTML))
 	_, _ = htmlFile.WriteString("</body></html>")
 	if errorHTML != nil {
-		logger.Errorf("Could not convert to HTML: " + sourceFile)
+		logger.Errorf("Could not convert to HTML: %s", sourceFile)
+		logger.Info("Exiting gopress with errors")
+		return
 	}
+
 	defer htmlFile.Close()
 	htmlFile.Sync()
 	logger.Info("Exiting gopress")
