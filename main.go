@@ -43,16 +43,19 @@ func main() {
 	var sourceFile string
 	var destinationDir string
 	var verboseMode bool
+	var log string
 	var newDir bool
 
 	flag.StringVar(&sourceFile, "inputFile", "", "File to be converted to HTML presentation")
 	flag.StringVar(&destinationDir, "outputDir", "", "Directory where HTML presentation will be written")
 	flag.BoolVar(&verboseMode, "v", false, "Verbose mode prints progress messages to screen")
+	flag.StringVar(&log, "log", "", "Sets logging level to: Emergency, Alert, Critical, Error, Warning, Notice, Info, or Debug. None is default.")
 	flag.BoolVar(&newDir, "newDir", false, "Creates a new directory named after the file")
+
+	logger := stdlog.GetFromFlags()
 
 	flag.Parse()
 
-	logger := stdlog.GetFromFlags()
 	logger.Info("Starting gopress")
 
 	if fileOrDirectoryDoesNotExist(sourceFile) {
