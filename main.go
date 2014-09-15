@@ -37,7 +37,7 @@ func main() {
 	var destinationDir string
 	var newDir bool
 
-	flag.StringVar(&sourceFile, "inputFile", "", "File to be converted to HTML presentation")
+	flag.StringVar(&sourceFile, "inputFile", "NULL", "File to be converted to HTML presentation")
 	flag.StringVar(&destinationDir, "outputDir", "", "Directory where HTML presentation will be written")
 	flag.BoolVar(&newDir, "newDir", false, "Creates a new directory named after the file")
 
@@ -59,7 +59,7 @@ func main() {
 		mkdirCommand := exec.Command("mkdir", destinationDir)
 		mkdirErr := mkdirCommand.Run()
 		if mkdirErr != nil {
-			logger.Errorf("Could not create new directory: %s.", destinationDir)
+			logger.Errorf("Could not create new directory: %s", destinationDir)
 			logger.Info("Exiting gopress with errors")
 			return
 		}
@@ -90,9 +90,9 @@ func main() {
 	}
 
 	markdownToHTML := blackfriday.MarkdownBasic(sourceFileRead)
-	_, _ = htmlFile.WriteString("<html><body>\n")
+	_, _ = htmlFile.WriteString("<!DOCTYPE html>\n<html>\n<body>\n")
 	_, errorHTML := htmlFile.Write(github_flavored_markdown.Markdown(markdownToHTML))
-	_, _ = htmlFile.WriteString("</body></html>")
+	_, _ = htmlFile.WriteString("</body>\n</html>")
 	if errorHTML != nil {
 		logger.Errorf("Could not convert to HTML: %s", sourceFile)
 		logger.Info("Exiting gopress with errors")
