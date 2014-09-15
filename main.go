@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -33,23 +32,15 @@ func fileOrDirectoryDoesNotExist(inputPath string) bool {
 	return false
 }
 
-func verbosePrint(msgToPrint string, verbose bool) {
-	if verbose {
-		fmt.Printf(msgToPrint)
-	}
-}
-
 func main() {
 	var sourceFile string
 	var destinationDir string
 	var verboseMode bool
-	var log string
 	var newDir bool
 
 	flag.StringVar(&sourceFile, "inputFile", "", "File to be converted to HTML presentation")
 	flag.StringVar(&destinationDir, "outputDir", "", "Directory where HTML presentation will be written")
 	flag.BoolVar(&verboseMode, "v", false, "Verbose mode prints progress messages to screen")
-	flag.StringVar(&log, "log", "", "Sets logging level to: Emergency, Alert, Critical, Error, Warning, Notice, Info, or Debug. None is default.")
 	flag.BoolVar(&newDir, "newDir", false, "Creates a new directory named after the file")
 
 	logger := stdlog.GetFromFlags()
@@ -59,7 +50,6 @@ func main() {
 	logger.Info("Starting gopress")
 
 	if fileOrDirectoryDoesNotExist(sourceFile) {
-		verbosePrint("Input file or directory does not exist: "+sourceFile+"\nExiting program.\n", verboseMode)
 		logger.Errorf("Input file or directory does not exist: %s", sourceFile)
 		return
 	}
@@ -67,17 +57,14 @@ func main() {
 	destinationDir = updateDestinationDirPath(destinationDir, sourceFile, newDir)
 
 	if fileOrDirectoryDoesNotExist(destinationDir) {
-		verbosePrint("No such directory, creating new directory: "+destinationDir+"\n", verboseMode)
 		logger.Warningf("Output directory unspecified or does not exist, creating new directory: %s", destinationDir)
 		mkdirCommand := exec.Command("mkdir", destinationDir)
 		mkdirErr := mkdirCommand.Run()
 		if mkdirErr != nil {
-			verbosePrint("Could not create new directory.\nExiting program.\n", verboseMode)
 			logger.Errorf("Could not create new directory.")
 			logger.Info("Exiting gopress with errors")
 			return
 		}
-		verbosePrint("Successfully created new directory.\n", verboseMode)
 		logger.Info("Successfully created new directory.")
 	}
 
@@ -85,11 +72,9 @@ func main() {
 	cpErr := copyCommand.Run()
 
 	if cpErr != nil {
-		verbosePrint("Could not copy files.\nExiting program.\n", verboseMode)
 		logger.Errorf("Could not copy files.")
 		logger.Info("Exiting gopress with errors")
 	}
-	verbosePrint("Successfully copied files.\nExiting program.\n", verboseMode)
 	logger.Info("Successfully copied files.")
 
 	sourceFileRead, errorReadFile := ioutil.ReadFile(sourceFile)
