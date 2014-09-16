@@ -2,9 +2,12 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"os/user"
+	"path/filepath"
 	"strings"
 
 	"github.com/alexcesaro/log/stdlog"
@@ -32,6 +35,15 @@ func fileOrDirectoryDoesNotExist(inputPath string) bool {
 	return false
 }
 
+func inputFileIsNotMarkdownFile(inputFile string) bool {
+	return strings.ToLower(filepath.Ext(inputFile)) != ".md"
+}
+
+func replaceTildaWithHomeDir(filepath string) string {
+	currentUser, _ := user.Current()
+	return strings.Replace(filepath, "~", currentUser.HomeDir, 1)
+}
+
 func main() {
 	var sourceFile string
 	var destinationDir string
@@ -47,8 +59,18 @@ func main() {
 
 	logger.Info("Starting gopress")
 
+	sourceFile = replaceTildaWithHomeDir(sourceFile)
+	destinationDir = replaceTildaWithHomeDir(destinationDir)
+
 	if fileOrDirectoryDoesNotExist(sourceFile) {
 		logger.Errorf("Input file or directory does not exist: %s", sourceFile)
+		logger.Info("Exited with errors.")
+		return
+	}
+
+	if inputFileIsNotMarkdownFile(sourceFile) {
+		logger.Errorf("Input file is not a Markdown file: %s", sourceFile)
+		logger.Info("Exited with errors.")
 		return
 	}
 
@@ -60,7 +82,7 @@ func main() {
 		mkdirErr := mkdirCommand.Run()
 		if mkdirErr != nil {
 			logger.Errorf("Could not create new directory: %s", destinationDir)
-			logger.Info("Exiting gopress with errors")
+			logger.Info("Exited with errors.")
 			return
 		}
 		logger.Info("Successfully created new directory.")
@@ -71,7 +93,7 @@ func main() {
 
 	if cpErr != nil {
 		logger.Error("Could not copy files.")
-		logger.Info("Exiting gopress with errors")
+		logger.Info("Exited with errors.")
 	}
 	logger.Info("Successfully copied files.")
 
@@ -85,7 +107,7 @@ func main() {
 	htmlFile, errorCreatingFile := os.Create(outputFile)
 	if errorCreatingFile != nil {
 		logger.Errorf("Could not create file: %s", outputFile)
-		logger.Info("Exiting gopress with errors")
+		logger.Info("Exited with errors.")
 		return
 	}
 
@@ -95,11 +117,13 @@ func main() {
 	_, _ = htmlFile.WriteString("</body>\n</html>")
 	if errorHTML != nil {
 		logger.Errorf("Could not convert to HTML: %s", sourceFile)
-		logger.Info("Exiting gopress with errors")
+		logger.Info("Exited with errors.")
 		return
 	}
 
+	fmt.Printf("The extension of the input file is: %s\n", filepath.Ext(sourceFile))
+	fmt.Println("Input file is NOT a Markdown file: ", inputFileIsNotMarkdownFile(sourceFile))
 	defer htmlFile.Close()
 	htmlFile.Sync()
-	logger.Info("Exiting gopress")
+	logger.Info("Exited with no errors.")
 }
