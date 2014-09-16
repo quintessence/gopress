@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -22,7 +21,7 @@ func extractInputFilename(inputFile string) string {
 
 func updateDestinationDirPath(currentDestDir string, currentInputFile string, newDirFlag bool) string {
 	if currentDestDir == "" || newDirFlag {
-		return currentDestDir + extractInputFilename(currentInputFile)
+		return currentDestDir + "/" + extractInputFilename(currentInputFile)
 	}
 
 	return currentDestDir
@@ -74,6 +73,19 @@ func main() {
 		return
 	}
 
+	sourceFileRead, errorReadFile := ioutil.ReadFile(sourceFile)
+	if errorReadFile != nil {
+		logger.Errorf("Could not read Markdown file: %s", sourceFile)
+		return
+	}
+
+	markdownToHTML := blackfriday.MarkdownBasic(sourceFileRead)
+	if markdownToHTML == nil {
+		logger.Errorf("Markdown file empty. Please create content or use different file: %s", sourceFile)
+		logger.Info("Exited with errors.")
+		return
+	}
+
 	destinationDir = updateDestinationDirPath(destinationDir, sourceFile, newDir)
 
 	if fileOrDirectoryDoesNotExist(destinationDir) {
@@ -97,12 +109,6 @@ func main() {
 	}
 	logger.Info("Successfully copied files.")
 
-	sourceFileRead, errorReadFile := ioutil.ReadFile(sourceFile)
-	if errorReadFile != nil {
-		logger.Errorf("Could not read Markdown file: %s", sourceFile)
-		return
-	}
-
 	outputFile := destinationDir + "/" + extractInputFilename(sourceFile) + ".html"
 	htmlFile, errorCreatingFile := os.Create(outputFile)
 	if errorCreatingFile != nil {
@@ -111,7 +117,6 @@ func main() {
 		return
 	}
 
-	markdownToHTML := blackfriday.MarkdownBasic(sourceFileRead)
 	_, _ = htmlFile.WriteString("<!DOCTYPE html>\n<html>\n<body>\n")
 	_, errorHTML := htmlFile.Write(github_flavored_markdown.Markdown(markdownToHTML))
 	_, _ = htmlFile.WriteString("</body>\n</html>")
@@ -121,8 +126,6 @@ func main() {
 		return
 	}
 
-	fmt.Printf("The extension of the input file is: %s\n", filepath.Ext(sourceFile))
-	fmt.Println("Input file is NOT a Markdown file: ", inputFileIsNotMarkdownFile(sourceFile))
 	defer htmlFile.Close()
 	htmlFile.Sync()
 	logger.Info("Exited with no errors.")
