@@ -20,7 +20,13 @@ func extractInputFilename(inputFile string) string {
 }
 
 func updateDestinationDirPath(currentDestDir string, currentInputFile string, newDirFlag bool) string {
-	if currentDestDir == "" || newDirFlag {
+	newDestDir, _ := filepath.Split(currentInputFile)
+
+	if currentDestDir == "" {
+		return newDestDir + extractInputFilename(currentInputFile) + "/"
+	}
+
+	if newDirFlag {
 		return currentDestDir + "/" + extractInputFilename(currentInputFile)
 	}
 
