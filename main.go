@@ -123,7 +123,8 @@ func main() {
 		return
 	}
 
-	_, _ = htmlFile.WriteString("<!DOCTYPE html>\n<html>\n<body>\n")
+	_, _ = htmlFile.WriteString("<!DOCTYPE html>\n<html>\n")
+	_, _ = htmlFile.WriteString("<head>\n<link rel=\"stylesheet\" href=\"custom.css\" type=\"text/css\" />\n</head>\n<body>\n")
 	_, errorHTML := htmlFile.Write(github_flavored_markdown.Markdown(markdownToHTML))
 	_, _ = htmlFile.WriteString("</body>\n</html>")
 	if errorHTML != nil {
