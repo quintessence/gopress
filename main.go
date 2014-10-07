@@ -68,25 +68,26 @@ func main() {
 
 	if fileOrDirectoryDoesNotExist(sourceFile) {
 		logger.Errorf("Input file or directory does not exist: %s", sourceFile)
-		logger.Info("Exited with errors.")
+		logger.Warning("Exited with errors.")
 		return
 	}
 
 	if inputFileIsNotMarkdownFile(sourceFile) {
 		logger.Errorf("Input file is not a Markdown file: %s", sourceFile)
-		logger.Info("Exited with errors.")
+		logger.Warning("Exited with errors.")
 		return
 	}
 
 	sourceFileRead, errorReadFile := ioutil.ReadFile(sourceFile)
 	if errorReadFile != nil {
 		logger.Errorf("Could not read Markdown file: %s", sourceFile)
+		logger.Warning("Exited with errors.")
 		return
 	}
 
-	if sourceFileRead == nil {
+	if len(sourceFileRead) == 0 {
 		logger.Errorf("Markdown file empty. Please create content or use different file: %s", sourceFile)
-		logger.Info("Exited with errors.")
+		logger.Warning("Exited with errors.")
 		return
 	}
 
@@ -98,7 +99,7 @@ func main() {
 		mkdirErr := mkdirCommand.Run()
 		if mkdirErr != nil {
 			logger.Errorf("Could not create new directory: %s", destinationDir)
-			logger.Info("Exited with errors.")
+			logger.Warning("Exited with errors.")
 			return
 		}
 		logger.Info("Successfully created new directory.")
@@ -109,7 +110,7 @@ func main() {
 
 	if cpErr != nil {
 		logger.Error("Could not copy files.")
-		logger.Info("Exited with errors.")
+		logger.Warning("Exited with errors.")
 	}
 	logger.Infof("Successfully copied files to: %s", destinationDir)
 
@@ -117,14 +118,14 @@ func main() {
 	htmlFile, errorCreatingFile := os.Create(outputFile)
 	if errorCreatingFile != nil {
 		logger.Errorf("Could not create file: %s", outputFile)
-		logger.Info("Exited with errors.")
+		logger.Warning("Exited with errors.")
 		return
 	}
 
 	_, errorHTML := htmlFile.WriteString(mdhtml.GenerateHTML(sourceFile))
 	if errorHTML != nil {
-		logger.Errorf("Could not convert to HTML: %s", sourceFile)
-		logger.Info("Exited with errors.")
+		logger.Errorf("Could not write to HTML file: %s", outputFile)
+		logger.Warning("Exited with errors.")
 		return
 	}
 
