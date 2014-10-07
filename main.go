@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/alexcesaro/log/stdlog"
 	"github.com/microcosm-cc/bluemonday"
+	"github.com/qanx/gopress/mdhtml"
 	"github.com/russross/blackfriday"
 	"github.com/shurcooL/go/github_flavored_markdown"
 )
@@ -188,4 +190,5 @@ func main() {
 	defer htmlFile.Close()
 	htmlFile.Sync()
 	logger.Info("Exited with no errors.")
+	fmt.Println(mdhtml.SquareInteger(2))
 }
