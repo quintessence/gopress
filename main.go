@@ -105,10 +105,11 @@ func main() {
 		logger.Info("Successfully created new directory.")
 	}
 
-	copyCommand := exec.Command("cp", "-rf", sourceFile, destinationDir)
+	copyCommand := exec.Command("cp", "-rf", "css", "impress_css", "js", destinationDir)
 	cpErr := copyCommand.Run()
 
 	if cpErr != nil {
+		logger.Error(cpErr)
 		logger.Error("Could not copy files.")
 		logger.Warning("Exited with errors.")
 	}
