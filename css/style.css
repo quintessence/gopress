@@ -5,6 +5,7 @@
    License: none (public domain)
 */
 
+
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -33,6 +34,7 @@ footer, header, hgroup, menu, nav, section {
 }
 body {
     line-height: 1;
+    pointer-events: none;
 }
 ol{
   margin: 0px 0 20px 70px;
@@ -137,14 +139,61 @@ h2 {
   margin: 10px 0 20px 0;
 }
 
+h3 {
+  font-weight: 900;
+  font-size: 35px;
+  margin: 10px 0 20px 0;
+}
+
+h4 {
+  font-weight: 700;
+  font-size: 28px;
+  margin: 10px 0 20px 0;
+}
+
+h5 {
+  font-weight: 600;
+  font-size: 21px;
+  margin: 10px 0 20px 0;
+}
+
+h6 {
+  font-weight: 500;
+  font-size: 18px;
+  margin: 10px 0 20px 0;
+}
+
 p {
   font-weight: 400;
   color: #555;
 }
 
+strong {
+  font-weight: bold;
+}
+
+em {
+  font-style: italic;
+}
+
+small {
+  font-size: 20px;
+  color: grey;
+}
+/*
 a {
   text-decoration: none;
   border-bottom: 1px solid #ddd;
+}
+*/
+a:link, a:visited {
+  color: grey;
+  text-decoration: underline;
+  cursor: auto;
+}
+
+a:link:active, a:visited:active {
+  color: orange;
 }
 
 li {

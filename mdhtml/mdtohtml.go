@@ -25,8 +25,8 @@ func GenerateHTML(sourceFile string) string {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=1024" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <link rel="shortcut icon" href="css/favicon.png" />
-    <link rel="apple-touch-icon" href="css/apple-touch-icon.png" />
+    <link rel="shortcut icon" href="css/logo-32x32.png" />
+    <link rel="apple-touch-icon" href="css/logo-50x50.png" />
     <!-- Code Prettifier: -->
     <link href="css/highlight.css" type="text/css" rel="stylesheet" />
     <script type="text/javascript" src="js/highlight.pack.js"></script>
