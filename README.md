@@ -26,6 +26,16 @@ $ go run main.go -inputFile=/path/to/myfile.md -outputDir=/path/to/output -newDi
 
 This will create a new subdirectory named "myfile" in /path/to/output.
 
+### Custom CSS
+
+By default, gopress will look for a `custom.css` file in the same directory as your input file.
+If no `custom.css` file is present, then the default attributes will be used as defined in `css/style.css`.
+
+### Images
+
+Locally stored images must be in an `images` subdirectory of where your input file is stored. This is because
+the images used in the presentation will be copied to the `images` subdirectory of the presentation.
+
 ### Logging
 
 By default, the logging level is set to "info". To change the logging level use the -log parameter, e.g.:

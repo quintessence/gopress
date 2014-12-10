@@ -6,7 +6,7 @@ import (
 
 // CSSToHTML takes in a custom CSS file and wraps it in HTML style tags
 func CSSToHTML(customcssFilePath string) string {
-	customcssFileReadByte, _ := ioutil.ReadFile(customcssFilePath)
-	customcssFileRead := string(customcssFileReadByte)
-	return "<style>" + customcssFileRead + "</style>"
+	customcssFileByte, _ := ioutil.ReadFile(customcssFilePath)
+	customcssFile := string(customcssFileByte)
+	return "<style>" + customcssFile + "</style>"
 }
