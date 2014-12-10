@@ -32,10 +32,12 @@ article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
     display: block;
 }
+
 body {
     line-height: 1;
     pointer-events: none;
 }
+
 ol{
   margin: 0px 0 20px 70px;
 }
@@ -190,10 +192,12 @@ a:link, a:visited {
   color: grey;
   text-decoration: underline;
   cursor: auto;
+  pointer-events: auto;
 }
 
 a:link:active, a:visited:active {
   color: orange;
+  pointer-events: auto;
 }
 
 li {
