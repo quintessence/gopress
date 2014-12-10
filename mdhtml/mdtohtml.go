@@ -2,11 +2,16 @@ package mdhtml
 
 import (
 	"io/ioutil"
+	"strings"
 
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/russross/blackfriday"
 	"github.com/shurcooL/go/github_flavored_markdown"
 )
+
+func separateSlides(inputHTML string) string {
+	return strings.Replace(string(inputHTML), "<hr/>", "</div><div class='step'>", -1)
+}
 
 // GenerateHTML takes in a Markdown file and generates an HTML file
 func GenerateHTML(sourceFile string) string {
@@ -64,7 +69,7 @@ func GenerateHTML(sourceFile string) string {
   `
 
 	sourceFileRead, _ := ioutil.ReadFile(sourceFile)
-	markdownToHTML := blackfriday.MarkdownBasic(sourceFileRead)
-	htmlFromMarkdown := string(bluemonday.UGCPolicy().SanitizeBytes(github_flavored_markdown.Markdown(markdownToHTML))[:])
+	markdownToHTML := blackfriday.MarkdownCommon(sourceFileRead)
+	htmlFromMarkdown := separateSlides(string(bluemonday.UGCPolicy().SanitizeBytes(github_flavored_markdown.Markdown(markdownToHTML))[:]))
 	return htmlHeader + htmlCSSstyle + htmlFromMarkdown + htmlFooter
 }
