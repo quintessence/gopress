@@ -2,9 +2,11 @@ package mdhtml
 
 import (
 	"io/ioutil"
+	"path/filepath"
 	"strings"
 
 	"github.com/microcosm-cc/bluemonday"
+	"github.com/qanx/gopress/customcss"
 	"github.com/russross/blackfriday"
 	"github.com/shurcooL/go/github_flavored_markdown"
 )
@@ -41,15 +43,7 @@ func GenerateHTML(sourceFile string) string {
     </div>
   `
 
-	htmlCSSstyle := `
-    <style>
-    .slide {
-      color: #00786e;
-    }
-    h1 {
-      color: orange;
-    }
-    </style>
+	customhtmlCSSstyle := customcss.CSSToHTML(filepath.Dir(sourceFile)+"/"+"custom.css") + `
     <div style="background-color: white; height: 100%;">
       <div>
         <img style="position: absolute; bottom: 0; width: 100%" src="http://i.imgur.com/QtxV5NQ.jpg" />
@@ -71,5 +65,5 @@ func GenerateHTML(sourceFile string) string {
 	sourceFileRead, _ := ioutil.ReadFile(sourceFile)
 	markdownToHTML := blackfriday.MarkdownCommon(sourceFileRead)
 	htmlFromMarkdown := separateSlides(string(bluemonday.UGCPolicy().SanitizeBytes(github_flavored_markdown.Markdown(markdownToHTML))[:]))
-	return htmlHeader + htmlCSSstyle + htmlFromMarkdown + htmlFooter
+	return htmlHeader + customhtmlCSSstyle + htmlFromMarkdown + htmlFooter
 }
