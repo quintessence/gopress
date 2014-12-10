@@ -28,13 +28,13 @@ This will create a new subdirectory named "myfile" in /path/to/output.
 
 ### Custom CSS
 
-By default, gopress will look for a `custom.css` file in the same directory as your input file.
+gopress will look for a `custom.css` file in the same directory as your input file.
 If no `custom.css` file is present, then the default attributes will be used as defined in `css/style.css`.
 
 ### Images
 
 Locally stored images must be in an `images` subdirectory of where your input file is stored. This is because
-the images used in the presentation will be copied to the `images` subdirectory of the presentation.
+the images used in the presentation will be copied to the `images` subdirectory of the presentation's HTML file.
 
 ### Logging
 
