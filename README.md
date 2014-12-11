@@ -30,6 +30,7 @@ This will create a new subdirectory named "myfile" in /path/to/output.
 
 gopress will look for a `custom.css` file in the same directory as your input file.
 If no `custom.css` file is present, then the default attributes will be used as defined in `css/style.css`.
+Please keep in mind that the CSS from this file is being added to the header of the HTML presentation file.
 
 ### Images
 
