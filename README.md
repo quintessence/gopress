@@ -35,7 +35,16 @@ Please keep in mind that the CSS from this file is being added to the header of 
 ### Images
 
 Locally stored images must be in an `images` subdirectory of where your input file is stored. This is because
-the images used in the presentation will be copied to the `images` subdirectory of the presentation's HTML file.
+the images used in the presentation will be copied to the `images` subdirectory of the presentation's HTML file. Please note that only the following raster extensions are supported - there are no vector extensions currently supported:
+
+* BMP
+* BPG
+* GIF
+* JPG/JPEG/JFIF
+* PBM, PGM, PPM, and PNM
+* PNG
+* TIFF
+* WEBP
 
 ### Logging
 
