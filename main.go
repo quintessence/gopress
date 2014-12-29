@@ -112,8 +112,9 @@ func main() {
 	if cpErr != nil {
 		logger.Error("Could not copy CSS and JS files.")
 		logger.Warning("Exited with errors.")
+		return
 	}
-	logger.Infof("Successfully copied files to: %s", destinationDir)
+	logger.Infof("Successfully copied CSS and JS files to: %s", destinationDir)
 
 	outputFile := destinationDir + "/" + extractInputFilename(sourceFilePath) + ".html"
 	htmlFile, errorCreatingFile := os.Create(outputFile)
