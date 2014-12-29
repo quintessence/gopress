@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -50,6 +51,9 @@ func replaceTildaWithHomeDir(filepath string) string {
 }
 
 func main() {
+
+	fmt.Println(os.Args[0])
+
 	var sourceFilePath string
 	var destinationDir string
 	var newDir bool
