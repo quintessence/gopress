@@ -52,7 +52,7 @@ func replaceTildaWithHomeDir(filepath string) string {
 
 func main() {
 
-	fmt.Println(os.Args[0])
+	fmt.Println(exec.Command("pwd"))
 
 	var sourceFilePath string
 	var destinationDir string
