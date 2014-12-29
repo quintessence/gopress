@@ -52,8 +52,6 @@ func replaceTildaWithHomeDir(filepath string) string {
 
 func main() {
 
-	fmt.Println(exec.Command("pwd"))
-
 	var sourceFilePath string
 	var destinationDir string
 	var newDir bool
@@ -111,6 +109,7 @@ func main() {
 	}
 
 	copyCommand := exec.Command("cp", "-rf", "css", "impress_css", "js", destinationDir)
+	fmt.Println(copyCommand.Path)
 	cpErr := copyCommand.Run()
 
 	if cpErr != nil {
