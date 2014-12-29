@@ -19,15 +19,15 @@ func extractInputFilename(inputFile string) string {
 	return strings.Split(inputPathArray[len(inputPathArray)-1], ".")[0]
 }
 
-func updateDestinationDirPath(currentDestDir string, currentInputFile string, newDirFlag bool) string {
-	newDestDir, _ := filepath.Split(currentInputFile)
+func updateDestinationDirPath(currentDestDir string, inputFile string, newDirFlag bool) string {
+	newDestDir, _ := filepath.Split(inputFile)
 
 	if currentDestDir == "" {
-		return newDestDir + extractInputFilename(currentInputFile) + "/"
+		return newDestDir + extractInputFilename(inputFile) + "/"
 	}
 
 	if newDirFlag {
-		return currentDestDir + "/" + extractInputFilename(currentInputFile)
+		return currentDestDir + "/" + extractInputFilename(inputFile)
 	}
 
 	return currentDestDir
@@ -110,7 +110,7 @@ func main() {
 	cpErr := copyCommand.Run()
 
 	if cpErr != nil {
-		logger.Error("Could not copy files.")
+		logger.Error("Could not copy CSS and JS files.")
 		logger.Warning("Exited with errors.")
 	}
 	logger.Infof("Successfully copied files to: %s", destinationDir)
