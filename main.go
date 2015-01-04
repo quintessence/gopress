@@ -30,127 +30,127 @@ func main() {
 	logger := stdlog.GetFromFlags()
 
 	flag.Parse()
-	fmt.Println("Printing Source File Path:")
-	fmt.Println(sourceFilePath)
 	logger.Info("Starting gopress")
-	/*
-		sourceFilePath = filemanager.ReplaceTildaWithHomeDir(sourceFilePath)
-		destinationDir = filemanager.ReplaceTildaWithHomeDir(destinationDir)
 
+	destinationDir = filemanager.ReplaceTildaWithHomeDir(destinationDir)
+	/*
 		if filemanager.FileOrDirectoryDoesNotExist(sourceFilePath) {
 			logger.Errorf("Input file or directory does not exist: %s", sourceFilePath)
 			logger.Warning("Exited with errors.")
 			return
 		}
 	*/
-	path := "~/Development/training/gopress_pcf-training/public/decks/"
-	//path := "~/Development/training/gopress_pcf-training/public/decks/about-training.md,~/Development/training/gopress_pcf-training/public/decks/bosh-unused.md"
-	files = filemanager.MakeFileList(path, allTheFiles)
 
-	fmt.Println("Printing files:")
-	for _, file := range files {
-		fmt.Println(file)
-	}
-	//temporary return
-	return
+	files = filemanager.MakeFileList(sourceFilePath, allTheFiles)
+	/*
+		fmt.Println("Printing files:")
+		for _, file := range files {
+			fmt.Println(file)
+		}
+	*/
 
-	if filemanager.InputFileIsNotMarkdownFile(sourceFilePath) {
-		logger.Errorf("Input file is not a Markdown file: %s", sourceFilePath)
-		logger.Warning("Exited with errors.")
-		return
-	}
-
-	sourceFileRead, errorReadFile := ioutil.ReadFile(sourceFilePath)
-	if errorReadFile != nil {
-		logger.Errorf("Could not read Markdown file: %s", sourceFilePath)
-		logger.Warning("Exited with errors.")
-		return
-	}
-
-	if len(sourceFileRead) == 0 {
-		logger.Errorf("Markdown file empty. Please create content or use different file: %s", sourceFilePath)
-		logger.Warning("Exited with errors.")
-		return
-	}
-
-	destinationDir = filemanager.UpdateDestinationDirPath(destinationDir, sourceFilePath, newDir)
-
-	if filemanager.FileOrDirectoryDoesNotExist(destinationDir) {
-		logger.Warningf("Output directory unspecified or does not exist, creating new directory: %s", destinationDir)
-		mkdirCommand := exec.Command("mkdir", destinationDir)
-		mkdirErr := mkdirCommand.Run()
-		if mkdirErr != nil {
-			logger.Errorf("Could not create new directory: %s", destinationDir)
+	/*
+		if filemanager.InputFileIsNotMarkdownFile(sourceFilePath) {
+			logger.Errorf("Input file is not a Markdown file: %s", sourceFilePath)
 			logger.Warning("Exited with errors.")
 			return
 		}
-		logger.Info("Successfully created new directory.")
-	}
+	*/
 
-	copyCommand := exec.Command("cp", "-rf", "css", "impress_css", "js", destinationDir)
-	fmt.Println(copyCommand.Path)
-	cpErr := copyCommand.Run()
+	for _, file := range files {
+		sourceFileRead, errorReadFile := ioutil.ReadFile(file)
+		if errorReadFile != nil {
+			logger.Errorf("Could not read Markdown file: %s", file)
+			logger.Warning("Exited with errors.")
+			return
+		}
 
-	if cpErr != nil {
-		logger.Error("Could not copy CSS and JS files.")
-		logger.Warning("Exited with errors.")
-		return
-	}
-	logger.Infof("Successfully copied CSS and JS files to: %s", destinationDir)
+		if len(sourceFileRead) == 0 {
+			logger.Errorf("Markdown file empty. Please create content or use different file: %s", file)
+			logger.Warning("Exited with errors.")
+			return
+		}
 
-	outputFile := destinationDir + "/" + filemanager.ExtractInputFilename(sourceFilePath) + ".html"
-	htmlFile, errorCreatingFile := os.Create(outputFile)
-	if errorCreatingFile != nil {
-		logger.Errorf("Could not create file: %s", outputFile)
-		logger.Warning("Exited with errors.")
-		return
-	}
+		destinationDir = filemanager.UpdateDestinationDirPath(destinationDir, file, newDir)
 
-	//Convert Markdown to HTML
-	htmlContents := mdhtml.GenerateHTML(sourceFilePath)
-
-	//Locate image paths specified in HTML
-	findImagePaths := regexp.MustCompile("image(s)?.*(.(?i)(jp(e)?g|png|gif|bmp|tiff))")
-	imagesToCopy := findImagePaths.FindAllString(htmlContents, -1)
-
-	//Copy images to 'images' directory if there are existing images to copy. Create 'images' directory if needed.
-	imagesDirectory := destinationDir + "/" + "images"
-	if len(imagesToCopy) > 0 {
-		//Create 'images' directory if not present.
-		if filemanager.FileOrDirectoryDoesNotExist(imagesDirectory) {
-			mkdirCommand := exec.Command("mkdir", imagesDirectory)
+		if filemanager.FileOrDirectoryDoesNotExist(destinationDir) {
+			logger.Warningf("Output directory unspecified or does not exist, creating new directory: %s", destinationDir)
+			mkdirCommand := exec.Command("mkdir", destinationDir)
 			mkdirErr := mkdirCommand.Run()
 			if mkdirErr != nil {
-				logger.Errorf("Could not create 'images' directory: %s", imagesDirectory)
+				logger.Errorf("Could not create new directory: %s", destinationDir)
 				logger.Warning("Exited with errors.")
 				return
 			}
-			logger.Infof("Successfully created 'images' directory: %s", imagesDirectory)
+			logger.Info("Successfully created new directory.")
 		}
 
-		//Copy images to 'images' directory
-		for i := 0; i < len(imagesToCopy); i++ {
-			copyImagesCommand := exec.Command("cp", filepath.Dir(sourceFilePath)+"/"+imagesToCopy[i], imagesDirectory)
-			copyImagesError := copyImagesCommand.Run()
-			if copyImagesError != nil {
-				logger.Errorf("Could not copy image file: %s", filepath.Dir(sourceFilePath)+"/"+imagesToCopy[i])
-				logger.Warning("Exited with errors.")
-				return
+		copyCommand := exec.Command("cp", "-rf", "css", "impress_css", "js", destinationDir)
+		fmt.Println(copyCommand.Path)
+		cpErr := copyCommand.Run()
+
+		if cpErr != nil {
+			logger.Error("Could not copy CSS and JS files.")
+			logger.Warning("Exited with errors.")
+			return
+		}
+		logger.Infof("Successfully copied CSS and JS files to: %s", destinationDir)
+
+		outputFile := destinationDir + "/" + filemanager.ExtractInputFilename(file) + ".html"
+		htmlFile, errorCreatingFile := os.Create(outputFile)
+		if errorCreatingFile != nil {
+			logger.Errorf("Could not create file: %s", outputFile)
+			logger.Warning("Exited with errors.")
+			return
+		}
+
+		//Convert Markdown to HTML
+		htmlContents := mdhtml.GenerateHTML(file)
+
+		//Locate image paths specified in HTML
+		findImagePaths := regexp.MustCompile("image(s)?.*(.(?i)(jp(e)?g|png|gif|bmp|tiff))")
+		imagesToCopy := findImagePaths.FindAllString(htmlContents, -1)
+
+		//Copy images to 'images' directory if there are existing images to copy. Create 'images' directory if needed.
+		imagesDirectory := destinationDir + "/" + "images"
+		if len(imagesToCopy) > 0 {
+			//Create 'images' directory if not present.
+			if filemanager.FileOrDirectoryDoesNotExist(imagesDirectory) {
+				mkdirCommand := exec.Command("mkdir", imagesDirectory)
+				mkdirErr := mkdirCommand.Run()
+				if mkdirErr != nil {
+					logger.Errorf("Could not create 'images' directory: %s", imagesDirectory)
+					logger.Warning("Exited with errors.")
+					return
+				}
+				logger.Infof("Successfully created 'images' directory: %s", imagesDirectory)
 			}
+
+			//Copy images to 'images' directory
+			for i := 0; i < len(imagesToCopy); i++ {
+				copyImagesCommand := exec.Command("cp", filepath.Dir(file)+"/"+imagesToCopy[i], imagesDirectory)
+				copyImagesError := copyImagesCommand.Run()
+				if copyImagesError != nil {
+					logger.Errorf("Could not copy image file: %s", filepath.Dir(file)+"/"+imagesToCopy[i])
+					logger.Warning("Exited with errors.")
+					return
+				}
+			}
+			logger.Infof("Successfully copied image files to: %s", imagesDirectory)
 		}
-		logger.Infof("Successfully copied image files to: %s", imagesDirectory)
+
+		//Write HTML to file
+		_, errorHTML := htmlFile.WriteString(htmlContents)
+		if errorHTML != nil {
+			logger.Errorf("Could not write to HTML file: %s", outputFile)
+			logger.Warning("Exited with errors.")
+			return
+		}
+
+		//Close file and exit program.
+		defer htmlFile.Close()
+		htmlFile.Sync()
 	}
 
-	//Write HTML to file
-	_, errorHTML := htmlFile.WriteString(htmlContents)
-	if errorHTML != nil {
-		logger.Errorf("Could not write to HTML file: %s", outputFile)
-		logger.Warning("Exited with errors.")
-		return
-	}
-
-	//Close file and exit program.
-	defer htmlFile.Close()
-	htmlFile.Sync()
 	logger.Info("Exited with no errors.")
 }
