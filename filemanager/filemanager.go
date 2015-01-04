@@ -1,6 +1,7 @@
 package filemanager
 
 import (
+	"io/ioutil"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -41,8 +42,32 @@ func InputFileIsNotMarkdownFile(inputFile string) bool {
 	return strings.ToLower(filepath.Ext(inputFile)) != ".md"
 }
 
+func inputFileIsMarkdownFile(inputFile string) bool {
+	return strings.ToLower(filepath.Ext(inputFile)) == ".md"
+}
+
 //ReplaceTildaWithHomeDir - does as described.
 func ReplaceTildaWithHomeDir(filepath string) string {
 	currentUser, _ := user.Current()
 	return strings.Replace(filepath, "~", currentUser.HomeDir, 1)
+}
+
+//MakeFileList - makes list of one or more files
+func MakeFileList(path string, useAllMDfiles bool) []string {
+	var files []string
+	if useAllMDfiles {
+		path = ReplaceTildaWithHomeDir(path)
+		directoryContents, _ := ioutil.ReadDir(path)
+		for _, file := range directoryContents {
+			if inputFileIsMarkdownFile(file.Name()) {
+				files = append(files, path+file.Name())
+			}
+		}
+	} else {
+		files = strings.Split(path, ",")
+		for i := 0; i < len(files); i++ {
+			files[i] = ReplaceTildaWithHomeDir(files[i])
+		}
+	}
+	return files
 }

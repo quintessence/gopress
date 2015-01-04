@@ -8,7 +8,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
-	"strings"
 
 	"github.com/alexcesaro/log/stdlog"
 	"github.com/qanx/gopress/filemanager"
@@ -31,6 +30,7 @@ func main() {
 	logger := stdlog.GetFromFlags()
 
 	flag.Parse()
+	fmt.Println("Printing Source File Path:")
 	fmt.Println(sourceFilePath)
 	logger.Info("Starting gopress")
 	/*
@@ -43,19 +43,14 @@ func main() {
 			return
 		}
 	*/
-	path := filemanager.ReplaceTildaWithHomeDir("~/Development/training/gopress_pcf-training/public/decks/")
+	path := "~/Development/training/gopress_pcf-training/public/decks/"
+	//path := "~/Development/training/gopress_pcf-training/public/decks/about-training.md,~/Development/training/gopress_pcf-training/public/decks/bosh-unused.md"
+	files = filemanager.MakeFileList(path, allTheFiles)
 
-	if allTheFiles {
-		directoryContents, _ := ioutil.ReadDir(path)
-		for _, file := range directoryContents {
-			files = append(files, path+file.Name())
-		}
-	} else {
-		files = strings.Split(sourceFilePath, ",")
-		fmt.Println(sourceFilePath)
+	fmt.Println("Printing files:")
+	for _, file := range files {
+		fmt.Println(file)
 	}
-
-	fmt.Println(files)
 	//temporary return
 	return
 

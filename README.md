@@ -20,6 +20,19 @@ To run gopress, you only need to specify the input file. If there is no output d
 gopress -inputFile=/path/to/myfile.md
 ```
 
+There are two ways to convert multiple Markdown files to HTML presentations. The first is using a comma separated
+list:
+
+```bash
+gopress -inputFile=/path/to/myfile.md,/path/to/mysecondfile.md
+```
+
+The second is using the `-all` flag, which grabs all Markdown files in the specified directory:
+
+```bash
+gopress -inputFile=/path/to/files/ -all
+```
+
 If you would like to store the output to a specific subdirectory, then use the outputDir flag:
 
 ```bash
