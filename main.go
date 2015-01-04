@@ -6,76 +6,60 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"os/user"
 	"path/filepath"
 	"regexp"
 	"strings"
 
 	"github.com/alexcesaro/log/stdlog"
+	"github.com/qanx/gopress/filemanager"
 	"github.com/qanx/gopress/mdhtml"
 )
-
-func extractInputFilename(inputFile string) string {
-	inputPathArray := strings.Split(inputFile, "/")
-	return strings.Split(inputPathArray[len(inputPathArray)-1], ".")[0]
-}
-
-func updateDestinationDirPath(currentDestDir string, inputFile string, newDirFlag bool) string {
-	newDestDir, _ := filepath.Split(inputFile)
-
-	if currentDestDir == "" {
-		return newDestDir + extractInputFilename(inputFile) + "/"
-	}
-
-	if newDirFlag {
-		return currentDestDir + "/" + extractInputFilename(inputFile)
-	}
-
-	return currentDestDir
-}
-
-func fileOrDirectoryDoesNotExist(inputPath string) bool {
-	if _, err := os.Stat(inputPath); os.IsNotExist(err) {
-		return true
-	}
-	return false
-}
-
-func inputFileIsNotMarkdownFile(inputFile string) bool {
-	return strings.ToLower(filepath.Ext(inputFile)) != ".md"
-}
-
-func replaceTildaWithHomeDir(filepath string) string {
-	currentUser, _ := user.Current()
-	return strings.Replace(filepath, "~", currentUser.HomeDir, 1)
-}
 
 func main() {
 
 	var sourceFilePath string
 	var destinationDir string
 	var newDir bool
+	var allTheFiles bool
+	var files []string
 
-	flag.StringVar(&sourceFilePath, "inputFile", "NULL", "File to be converted to HTML presentation")
+	flag.StringVar(&sourceFilePath, "inputFile", "NULL", "Comma separated list of file(s) to be converted to HTML presentation")
 	flag.StringVar(&destinationDir, "outputDir", "", "Directory where HTML presentation will be written")
 	flag.BoolVar(&newDir, "newDir", false, "Creates a new directory named after the file")
+	flag.BoolVar(&allTheFiles, "all", false, "Used in conjunction with inputFiles. Will grab all Markdown ")
 
 	logger := stdlog.GetFromFlags()
 
 	flag.Parse()
-
+	fmt.Println(sourceFilePath)
 	logger.Info("Starting gopress")
+	/*
+		sourceFilePath = filemanager.ReplaceTildaWithHomeDir(sourceFilePath)
+		destinationDir = filemanager.ReplaceTildaWithHomeDir(destinationDir)
 
-	sourceFilePath = replaceTildaWithHomeDir(sourceFilePath)
-	destinationDir = replaceTildaWithHomeDir(destinationDir)
+		if filemanager.FileOrDirectoryDoesNotExist(sourceFilePath) {
+			logger.Errorf("Input file or directory does not exist: %s", sourceFilePath)
+			logger.Warning("Exited with errors.")
+			return
+		}
+	*/
+	path := filemanager.ReplaceTildaWithHomeDir("~/Development/training/gopress_pcf-training/public/decks/")
 
-	if fileOrDirectoryDoesNotExist(sourceFilePath) {
-		logger.Errorf("Input file or directory does not exist: %s", sourceFilePath)
-		logger.Warning("Exited with errors.")
-		return
+	if allTheFiles {
+		directoryContents, _ := ioutil.ReadDir(path)
+		for _, file := range directoryContents {
+			files = append(files, path+file.Name())
+		}
+	} else {
+		files = strings.Split(sourceFilePath, ",")
+		fmt.Println(sourceFilePath)
 	}
 
-	if inputFileIsNotMarkdownFile(sourceFilePath) {
+	fmt.Println(files)
+	//temporary return
+	return
+
+	if filemanager.InputFileIsNotMarkdownFile(sourceFilePath) {
 		logger.Errorf("Input file is not a Markdown file: %s", sourceFilePath)
 		logger.Warning("Exited with errors.")
 		return
@@ -94,9 +78,9 @@ func main() {
 		return
 	}
 
-	destinationDir = updateDestinationDirPath(destinationDir, sourceFilePath, newDir)
+	destinationDir = filemanager.UpdateDestinationDirPath(destinationDir, sourceFilePath, newDir)
 
-	if fileOrDirectoryDoesNotExist(destinationDir) {
+	if filemanager.FileOrDirectoryDoesNotExist(destinationDir) {
 		logger.Warningf("Output directory unspecified or does not exist, creating new directory: %s", destinationDir)
 		mkdirCommand := exec.Command("mkdir", destinationDir)
 		mkdirErr := mkdirCommand.Run()
@@ -119,7 +103,7 @@ func main() {
 	}
 	logger.Infof("Successfully copied CSS and JS files to: %s", destinationDir)
 
-	outputFile := destinationDir + "/" + extractInputFilename(sourceFilePath) + ".html"
+	outputFile := destinationDir + "/" + filemanager.ExtractInputFilename(sourceFilePath) + ".html"
 	htmlFile, errorCreatingFile := os.Create(outputFile)
 	if errorCreatingFile != nil {
 		logger.Errorf("Could not create file: %s", outputFile)
@@ -138,7 +122,7 @@ func main() {
 	imagesDirectory := destinationDir + "/" + "images"
 	if len(imagesToCopy) > 0 {
 		//Create 'images' directory if not present.
-		if fileOrDirectoryDoesNotExist(imagesDirectory) {
+		if filemanager.FileOrDirectoryDoesNotExist(imagesDirectory) {
 			mkdirCommand := exec.Command("mkdir", imagesDirectory)
 			mkdirErr := mkdirCommand.Run()
 			if mkdirErr != nil {
