@@ -85,16 +85,18 @@ func main() {
 			logger.Info("Successfully created new directory.")
 		}
 
-		copyCommand := exec.Command("cp", "-rf", "css", "impress_css", "js", destinationDir)
-		fmt.Println(copyCommand.Path)
-		cpErr := copyCommand.Run()
+		if filemanager.FileOrDirectoryDoesNotExist(destinationDir+"/css") || filemanager.FileOrDirectoryDoesNotExist(destinationDir+"/impress_css") || filemanager.FileOrDirectoryDoesNotExist(destinationDir+"/js") {
+			copyCommand := exec.Command("cp", "-rf", "css", "impress_css", "js", destinationDir)
+			fmt.Println(copyCommand.Path)
+			cpErr := copyCommand.Run()
 
-		if cpErr != nil {
-			logger.Error("Could not copy CSS and JS files.")
-			logger.Warning("Exited with errors.")
-			return
+			if cpErr != nil {
+				logger.Error("Could not copy CSS and JS files.")
+				logger.Warning("Exited with errors.")
+				return
+			}
+			logger.Infof("Successfully copied CSS and JS files to: %s", destinationDir)
 		}
-		logger.Infof("Successfully copied CSS and JS files to: %s", destinationDir)
 
 		outputFile := destinationDir + "/" + filemanager.ExtractInputFilename(file) + ".html"
 		htmlFile, errorCreatingFile := os.Create(outputFile)
@@ -136,7 +138,7 @@ func main() {
 					return
 				}
 			}
-			logger.Infof("Successfully copied image files to: %s", imagesDirectory)
+			logger.Infof("Successfully copied image files for %s to: %s", filemanager.ExtractInputFilename(file), imagesDirectory)
 		}
 
 		//Write HTML to file
