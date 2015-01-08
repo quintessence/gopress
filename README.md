@@ -41,7 +41,7 @@ To run gopress, you only need to specify the input file. If there is no output d
 gopress -inputFile=/path/to/myfile.md
 ```
 
-** How to use multiple files **
+**How to use multiple files**
 
 There are two ways to convert multiple Markdown files to HTML presentations. The first is using a comma separated
 list:
@@ -82,7 +82,7 @@ gopress -inputFile=/path/to/myfile.md -cssDir=/path/to/cssJS.tar
 
 You should not change the name or untar these files (the application handles this).
 
-** Custom CSS **
+**Custom CSS**
 
 gopress will look for a `custom.css` file in the same directory as your input file.
 If no `custom.css` file is present, then the default attributes will be used as defined in `css/style.css`.
