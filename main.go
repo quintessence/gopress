@@ -17,12 +17,14 @@ import (
 func main() {
 
 	var sourceFilePath string
+	var cssDir string
 	var destinationDir string
 	var newDir bool
 	var allTheFiles bool
 	var files []string
 
 	flag.StringVar(&sourceFilePath, "inputFile", "NULL", "Comma separated list of file(s) to be converted to HTML presentation")
+	flag.StringVar(&cssDir, "cssDir", "NULL", "Directory where CSS/JS files are located")
 	flag.StringVar(&destinationDir, "outputDir", "", "Directory where HTML presentation will be written")
 	flag.BoolVar(&newDir, "newDir", false, "Creates a new directory named after the file")
 	flag.BoolVar(&allTheFiles, "all", false, "Used in conjunction with inputFiles. Will grab all Markdown ")
@@ -32,9 +34,13 @@ func main() {
 	flag.Parse()
 	logger.Info("Starting gopress")
 
+	if cssDir == "NULL" {
+		cssDir = sourceFilePath
+	}
+
 	destinationDir = filemanager.ReplaceTildaWithHomeDir(destinationDir)
 	/*
-		if filemanager.FileOrDirectoryDoesNotExist(sourceFilePath) {
+		if filemanager.DoesNotExist(sourceFilePath) {
 			logger.Errorf("Input file or directory does not exist: %s", sourceFilePath)
 			logger.Warning("Exited with errors.")
 			return
@@ -50,7 +56,7 @@ func main() {
 	*/
 
 	/*
-		if filemanager.InputFileIsNotMarkdownFile(sourceFilePath) {
+		if filemanager.IsNotMarkdown(sourceFilePath) {
 			logger.Errorf("Input file is not a Markdown file: %s", sourceFilePath)
 			logger.Warning("Exited with errors.")
 			return
@@ -71,9 +77,9 @@ func main() {
 			return
 		}
 
-		destinationDir = filemanager.UpdateDestinationDirPath(destinationDir, file, newDir)
+		destinationDir = filemanager.UpdateDestPath(destinationDir, file, newDir)
 
-		if filemanager.FileOrDirectoryDoesNotExist(destinationDir) {
+		if filemanager.DoesNotExist(destinationDir) {
 			logger.Warningf("Output directory unspecified or does not exist, creating new directory: %s", destinationDir)
 			mkdirCommand := exec.Command("mkdir", destinationDir)
 			mkdirErr := mkdirCommand.Run()
@@ -85,9 +91,16 @@ func main() {
 			logger.Info("Successfully created new directory.")
 		}
 
-		if filemanager.FileOrDirectoryDoesNotExist(destinationDir+"/css") || filemanager.FileOrDirectoryDoesNotExist(destinationDir+"/impress_css") || filemanager.FileOrDirectoryDoesNotExist(destinationDir+"/js") {
-			copyCommand := exec.Command("cp", "-rf", "css", "impress_css", "js", destinationDir)
-			fmt.Println(copyCommand.Path)
+		if filemanager.DoesNotExist(cssDir+"css") || filemanager.DoesNotExist(cssDir+"impress_css") || filemanager.DoesNotExist(cssDir+"js") {
+			logger.Errorf("CSS/JS files do not exist in specified directory: %s", cssDir)
+			logger.Warning("If the CSS/JS files are not in the same directory as the Markdown files, please specify the directory with the cssDir flag.")
+			logger.Warning("Exited with errors.")
+			return
+		}
+
+		if filemanager.DoesNotExist(destinationDir+"/css") || filemanager.DoesNotExist(destinationDir+"/impress_css") || filemanager.DoesNotExist(destinationDir+"/js") {
+			copyCommand := exec.Command("cp", "-rf", cssDir+"/css", cssDir+"/impress_css", cssDir+"/js", destinationDir)
+			fmt.Println("cssDir is: " + cssDir + "/css")
 			cpErr := copyCommand.Run()
 
 			if cpErr != nil {
@@ -98,7 +111,7 @@ func main() {
 			logger.Infof("Successfully copied CSS and JS files to: %s", destinationDir)
 		}
 
-		outputFile := destinationDir + "/" + filemanager.ExtractInputFilename(file) + ".html"
+		outputFile := destinationDir + "/" + filemanager.ExtractFilename(file) + ".html"
 		htmlFile, errorCreatingFile := os.Create(outputFile)
 		if errorCreatingFile != nil {
 			logger.Errorf("Could not create file: %s", outputFile)
@@ -117,7 +130,7 @@ func main() {
 		imagesDirectory := destinationDir + "/" + "images"
 		if len(imagesToCopy) > 0 {
 			//Create 'images' directory if not present.
-			if filemanager.FileOrDirectoryDoesNotExist(imagesDirectory) {
+			if filemanager.DoesNotExist(imagesDirectory) {
 				mkdirCommand := exec.Command("mkdir", imagesDirectory)
 				mkdirErr := mkdirCommand.Run()
 				if mkdirErr != nil {
@@ -138,7 +151,7 @@ func main() {
 					return
 				}
 			}
-			logger.Infof("Successfully copied image files for %s to: %s", filemanager.ExtractInputFilename(file), imagesDirectory)
+			logger.Infof("Successfully copied image files for %s to: %s", filemanager.ExtractFilename(file), imagesDirectory)
 		}
 
 		//Write HTML to file

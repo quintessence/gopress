@@ -8,41 +8,41 @@ import (
 	"strings"
 )
 
-//ExtractInputFilename - does as described.
-func ExtractInputFilename(inputFile string) string {
+//ExtractFilename - does as described.
+func ExtractFilename(inputFile string) string {
 	inputPathArray := strings.Split(inputFile, "/")
 	return strings.Split(inputPathArray[len(inputPathArray)-1], ".")[0]
 }
 
-//UpdateDestinationDirPath - does as described.
-func UpdateDestinationDirPath(currentDestDir string, inputFile string, newDirFlag bool) string {
+//UpdateDestPath - does as described.
+func UpdateDestPath(currentDestDir string, inputFile string, newDirFlag bool) string {
 	newDestDir, _ := filepath.Split(inputFile)
 
 	if currentDestDir == "" {
-		return newDestDir + ExtractInputFilename(inputFile) + "/"
+		return newDestDir + ExtractFilename(inputFile) + "/"
 	}
 
 	if newDirFlag {
-		return currentDestDir + "/" + ExtractInputFilename(inputFile)
+		return currentDestDir + "/" + ExtractFilename(inputFile)
 	}
 
 	return currentDestDir
 }
 
-//FileOrDirectoryDoesNotExist - does as described.
-func FileOrDirectoryDoesNotExist(inputPath string) bool {
+//DoesNotExist - Checks if a file or directory does not exist.
+func DoesNotExist(inputPath string) bool {
 	if _, err := os.Stat(inputPath); os.IsNotExist(err) {
 		return true
 	}
 	return false
 }
 
-//InputFileIsNotMarkdownFile - does as described.
-func InputFileIsNotMarkdownFile(inputFile string) bool {
+//IsNotMarkdown - does as described.
+func IsNotMarkdown(inputFile string) bool {
 	return strings.ToLower(filepath.Ext(inputFile)) != ".md"
 }
 
-func inputFileIsMarkdownFile(inputFile string) bool {
+func isMarkdown(inputFile string) bool {
 	return strings.ToLower(filepath.Ext(inputFile)) == ".md"
 }
 
@@ -59,7 +59,7 @@ func MakeFileList(path string, useAllMDfiles bool) []string {
 		path = ReplaceTildaWithHomeDir(path)
 		directoryContents, _ := ioutil.ReadDir(path)
 		for _, file := range directoryContents {
-			if inputFileIsMarkdownFile(file.Name()) {
+			if isMarkdown(file.Name()) {
 				files = append(files, path+file.Name())
 			}
 		}
