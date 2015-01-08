@@ -34,6 +34,7 @@ func GenerateHTML(sourceFile string) string {
     <script>hljs.initHighlightingOnLoad();</script>
     <link href="css/style.css" rel="stylesheet" />
     <link href="http://fonts.googleapis.com/css?family=Lato:300,900" rel="stylesheet" />
+		<base target="_blank">
   </head>
   <body>
     <div class="fallback-message">
