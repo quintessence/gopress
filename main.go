@@ -91,23 +91,40 @@ func main() {
 			logger.Info("Successfully created new directory.")
 		}
 
-		if filemanager.DoesNotExist(cssDir+"/css") || filemanager.DoesNotExist(cssDir+"/impress_css") || filemanager.DoesNotExist(cssDir+"/js") {
-			logger.Errorf("CSS/JS files do not exist in specified directory: %s", cssDir)
-			logger.Warning("If the CSS/JS files are not in the same directory as the Markdown files, please specify the directory with the cssDir flag.")
+		if filemanager.DoesNotExist(cssDir + "/cssJS.tar") {
+			logger.Errorf("cssJS.tar does not exist in specified directory: %s", cssDir)
+			logger.Warning("If cssJS.tar is not in the same directory as the Markdown files, please specify the directory with the cssDir flag.")
 			logger.Warning("Exited with errors.")
 			return
 		}
 
-		if filemanager.DoesNotExist(destinationDir+"/css") || filemanager.DoesNotExist(destinationDir+"/impress_css") || filemanager.DoesNotExist(destinationDir+"/js") {
-			copyCommand := exec.Command("cp", "-rf", cssDir+"/css", cssDir+"/impress_css", cssDir+"/js", destinationDir)
+		if filemanager.DoesNotExist(destinationDir+"/css") && filemanager.DoesNotExist(destinationDir+"/impress_css") && filemanager.DoesNotExist(destinationDir+"/js") {
+			copyCommand := exec.Command("cp", cssDir+"/cssJS.tar", destinationDir)
 			cpErr := copyCommand.Run()
 
 			if cpErr != nil {
-				logger.Error("Could not copy CSS and JS files.")
+				logger.Error("Could not copy cssJS.tar")
 				logger.Warning("Exited with errors.")
 				return
 			}
-			logger.Infof("Successfully copied CSS and JS files to: %s", destinationDir)
+			logger.Infof("Successfully copied cssJS.tar to: %s", destinationDir)
+
+			tarCommand := exec.Command("tar", "-xf", destinationDir+"/cssJS.tar", "-C", destinationDir)
+			tarErr := tarCommand.Run()
+			if tarErr != nil || (filemanager.DoesNotExist(destinationDir+"/css") && filemanager.DoesNotExist(destinationDir+"/impress_css") && filemanager.DoesNotExist(destinationDir+"/js")) {
+				logger.Error("Could not untar cssJS.tar")
+				logger.Warning("Exited with errors.")
+				return
+			}
+			logger.Info("Successfully extracted css, impress_css, and js from cssJS.tar")
+
+			deleteTarCommand := exec.Command("rm", destinationDir+"/cssJS.tar")
+			deleteTarErr := deleteTarCommand.Run()
+			if deleteTarErr != nil {
+				logger.Warning("Could not delete cssJS.tar")
+			} else {
+				logger.Info("Successfully deleted cssJS.tar")
+			}
 		}
 
 		outputFile := destinationDir + "/" + filemanager.ExtractFilename(file) + ".html"
