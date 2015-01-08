@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -39,6 +38,7 @@ func main() {
 	}
 
 	destinationDir = filemanager.ReplaceTildaWithHomeDir(destinationDir)
+	cssDir = filemanager.ReplaceTildaWithHomeDir(cssDir)
 	/*
 		if filemanager.DoesNotExist(sourceFilePath) {
 			logger.Errorf("Input file or directory does not exist: %s", sourceFilePath)
@@ -91,7 +91,7 @@ func main() {
 			logger.Info("Successfully created new directory.")
 		}
 
-		if filemanager.DoesNotExist(cssDir+"css") || filemanager.DoesNotExist(cssDir+"impress_css") || filemanager.DoesNotExist(cssDir+"js") {
+		if filemanager.DoesNotExist(cssDir+"/css") || filemanager.DoesNotExist(cssDir+"/impress_css") || filemanager.DoesNotExist(cssDir+"/js") {
 			logger.Errorf("CSS/JS files do not exist in specified directory: %s", cssDir)
 			logger.Warning("If the CSS/JS files are not in the same directory as the Markdown files, please specify the directory with the cssDir flag.")
 			logger.Warning("Exited with errors.")
@@ -100,7 +100,6 @@ func main() {
 
 		if filemanager.DoesNotExist(destinationDir+"/css") || filemanager.DoesNotExist(destinationDir+"/impress_css") || filemanager.DoesNotExist(destinationDir+"/js") {
 			copyCommand := exec.Command("cp", "-rf", cssDir+"/css", cssDir+"/impress_css", cssDir+"/js", destinationDir)
-			fmt.Println("cssDir is: " + cssDir + "/css")
 			cpErr := copyCommand.Run()
 
 			if cpErr != nil {
