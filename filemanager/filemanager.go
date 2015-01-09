@@ -48,8 +48,11 @@ func isMarkdown(inputFile string) bool {
 
 //ReplaceTildaWithHomeDir - does as described.
 func ReplaceTildaWithHomeDir(filepath string) string {
-	currentUser, _ := user.Current()
-	return strings.Replace(filepath, "~", currentUser.HomeDir, 1)
+	if strings.Contains(filepath, "~") {
+		currentUser, _ := user.Current()
+		return strings.Replace(filepath, "~", currentUser.HomeDir, 1)
+	}
+	return filepath
 }
 
 //MakeFileList - makes list of one or more files
