@@ -46,7 +46,7 @@ func GenerateHTML(sourceFile string) string {
 	customhtmlCSSstyle := customcss.CSSToHTML(filepath.Dir(sourceFile)+"/"+"custom.css") + `
     <div style="background-color: white; height: 100%;">
       <div>
-        <img style="position: absolute; bottom: 0; width: 100%" src="http://i.imgur.com/QtxV5NQ.jpg" />
+        <img style="position: absolute; bottom: 0; width: 100%" src="http://i.imgur.com/53hfwk9.png" />
       </div>
     </div>
     <div id="impress">

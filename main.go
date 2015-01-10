@@ -99,15 +99,19 @@ func main() {
 		}
 
 		if filemanager.DoesNotExist(destinationDir+"/css") && filemanager.DoesNotExist(destinationDir+"/impress_css") && filemanager.DoesNotExist(destinationDir+"/js") {
-			copyCommand := exec.Command("cp", cssDir+"/cssJS.tar", destinationDir)
-			cpErr := copyCommand.Run()
+			if destinationDir == cssDir {
+				logger.Infof("Skip: cp cssJS.tar - output directory same as input directory.")
+			} else {
+				copyCommand := exec.Command("cp", cssDir+"/cssJS.tar", destinationDir)
+				cpErr := copyCommand.Run()
 
-			if cpErr != nil {
-				logger.Error("Could not copy cssJS.tar")
-				logger.Warning("Exited with errors.")
-				return
+				if cpErr != nil {
+					logger.Error("Could not copy cssJS.tar")
+					logger.Warning("Exited with errors.")
+					return
+				}
+				logger.Infof("Successfully copied cssJS.tar to: %s", destinationDir)
 			}
-			logger.Infof("Successfully copied cssJS.tar to: %s", destinationDir)
 
 			tarCommand := exec.Command("tar", "-xf", destinationDir+"/cssJS.tar", "-C", destinationDir)
 			tarErr := tarCommand.Run()
@@ -118,12 +122,16 @@ func main() {
 			}
 			logger.Info("Successfully extracted css, impress_css, and js from cssJS.tar")
 
-			deleteTarCommand := exec.Command("rm", destinationDir+"/cssJS.tar")
-			deleteTarErr := deleteTarCommand.Run()
-			if deleteTarErr != nil {
-				logger.Warning("Could not delete cssJS.tar")
+			if destinationDir == cssDir {
+				logger.Infof("Skip: rm cssJS.tar - output directory same as input directory.")
 			} else {
-				logger.Info("Successfully deleted cssJS.tar")
+				deleteTarCommand := exec.Command("rm", destinationDir+"/cssJS.tar")
+				deleteTarErr := deleteTarCommand.Run()
+				if deleteTarErr != nil {
+					logger.Warning("Could not delete cssJS.tar")
+				} else {
+					logger.Info("Successfully deleted cssJS.tar")
+				}
 			}
 		}
 
@@ -143,31 +151,37 @@ func main() {
 		imagesToCopy := findImagePaths.FindAllString(htmlContents, -1)
 
 		//Copy images to 'images' directory if there are existing images to copy. Create 'images' directory if needed.
-		imagesDirectory := destinationDir + "/" + "images"
-		if len(imagesToCopy) > 0 {
-			//Create 'images' directory if not present.
-			if filemanager.DoesNotExist(imagesDirectory) {
-				mkdirCommand := exec.Command("mkdir", imagesDirectory)
-				mkdirErr := mkdirCommand.Run()
-				if mkdirErr != nil {
-					logger.Errorf("Could not create 'images' directory: %s", imagesDirectory)
-					logger.Warning("Exited with errors.")
-					return
-				}
-				logger.Infof("Successfully created 'images' directory: %s", imagesDirectory)
+		if destinationDir == cssDir {
+			if file == files[0] {
+				logger.Infof("Skip: image file copy - output directory same as input directory.")
 			}
+		} else {
+			imagesDirectory := destinationDir + "/" + "images"
+			if len(imagesToCopy) > 0 {
+				//Create 'images' directory if not present.
+				if filemanager.DoesNotExist(imagesDirectory) {
+					mkdirCommand := exec.Command("mkdir", imagesDirectory)
+					mkdirErr := mkdirCommand.Run()
+					if mkdirErr != nil {
+						logger.Errorf("Could not create 'images' directory: %s", imagesDirectory)
+						logger.Warning("Exited with errors.")
+						return
+					}
+					logger.Infof("Successfully created 'images' directory: %s", imagesDirectory)
+				}
 
-			//Copy images to 'images' directory
-			for i := 0; i < len(imagesToCopy); i++ {
-				copyImagesCommand := exec.Command("cp", filepath.Dir(file)+"/"+imagesToCopy[i], imagesDirectory)
-				copyImagesError := copyImagesCommand.Run()
-				if copyImagesError != nil {
-					logger.Errorf("Could not copy image file: %s", filepath.Dir(file)+"/"+imagesToCopy[i])
-					logger.Warning("Exited with errors.")
-					return
+				//Copy images to 'images' directory
+				for i := 0; i < len(imagesToCopy); i++ {
+					copyImagesCommand := exec.Command("cp", filepath.Dir(file)+"/"+imagesToCopy[i], imagesDirectory)
+					copyImagesError := copyImagesCommand.Run()
+					if copyImagesError != nil {
+						logger.Errorf("Could not copy image file: %s", filepath.Dir(file)+"/"+imagesToCopy[i])
+						logger.Warning("Exited with errors.")
+						return
+					}
 				}
+				logger.Infof("Successfully copied image files for %s to: %s", filemanager.ExtractFilename(file), imagesDirectory)
 			}
-			logger.Infof("Successfully copied image files for %s to: %s", filemanager.ExtractFilename(file), imagesDirectory)
 		}
 
 		//Write HTML to file
@@ -181,6 +195,7 @@ func main() {
 		//Close file and exit program.
 		defer htmlFile.Close()
 		htmlFile.Sync()
+		logger.Infof("Successfully created presentation: %s", filemanager.ExtractFilename(file))
 	}
 
 	logger.Info("Exited with no errors.")
