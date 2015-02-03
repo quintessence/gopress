@@ -36,7 +36,7 @@ func main() {
 	if cssDir == "NULL" && allTheFiles {
 		cssDir = sourceFilePath
 	} else if cssDir == "NULL" {
-		cssDir = filepath.Dir(sourceFilePath)
+		cssDir = filepath.Dir(sourceFilePath) + "/"
 	}
 
 	destinationDir = filemanager.ReplaceTildaWithHomeDir(destinationDir)
