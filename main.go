@@ -22,12 +22,14 @@ func main() {
 	var newDir bool
 	var allTheFiles bool
 	var files []string
+	var createPDF bool
 
 	flag.StringVar(&sourceFilePath, "inputFile", "NULL", "Comma separated list of file(s) to be converted to HTML presentation")
 	flag.StringVar(&cssDir, "cssDir", "NULL", "Directory where CSS/JS files are located")
 	flag.StringVar(&destinationDir, "outputDir", "", "Directory where HTML presentation will be written")
 	flag.BoolVar(&newDir, "newDir", false, "Creates a new directory named after the file")
 	flag.BoolVar(&allTheFiles, "all", false, "Used in conjunction with inputFiles. Will grab all Markdown ")
+	flag.BoolVar(&createPDF, "pdf", false, "Used to generate PDF slides of the HTML presentation")
 
 	logger := stdlog.GetFromFlags()
 
@@ -148,9 +150,11 @@ func main() {
 			return
 		}
 
-		pdfFile := destinationDir + "/" + filemanager.ExtractFilename(file) + ".pdf"
-		pdf.MakePDF(file, pdfFile)
-		return
+		if createPDF {
+			pdfFile := destinationDir + "/" + filemanager.ExtractFilename(file) + ".pdf"
+			pdf.MakePDF(file, pdfFile)
+			logger.Infof("Created PDF of presentation in output directory: %s", filemanager.ExtractFilename(file)+".pdf")
+		}
 
 		//Convert Markdown to HTML
 		htmlContents := mdhtml.GenerateHTML(file)
