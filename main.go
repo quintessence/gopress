@@ -11,6 +11,7 @@ import (
 	"github.com/alexcesaro/log/stdlog"
 	"github.com/qanx/gopress/filemanager"
 	"github.com/qanx/gopress/mdhtml"
+	"github.com/qanx/gopress/pdf"
 )
 
 func main() {
@@ -139,13 +140,17 @@ func main() {
 		}
 
 		outputFile := destinationDir + "/" + filemanager.ExtractFilename(file) + ".html"
-		//pdfFile := destinationDir + "/" + filemanager.ExtractFilename(file) + ".pdf"
+
 		htmlFile, errorCreatingFile := os.Create(outputFile)
 		if errorCreatingFile != nil {
 			logger.Errorf("Could not create file: %s", outputFile)
 			logger.Warning("Exited with errors.")
 			return
 		}
+
+		pdfFile := destinationDir + "/" + filemanager.ExtractFilename(file) + ".pdf"
+		pdf.MakePDF(file, pdfFile)
+		return
 
 		//Convert Markdown to HTML
 		htmlContents := mdhtml.GenerateHTML(file)
