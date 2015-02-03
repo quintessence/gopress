@@ -15,6 +15,13 @@ func separateSlides(inputHTML string) string {
 	return strings.Replace(string(inputHTML), "<hr/>", "</div><div class='step'>", -1)
 }
 
+// HTMLFromMarkdown converts Markdown to HTML
+func HTMLFromMarkdown(sourceFile string) string {
+	sourceFileRead, _ := ioutil.ReadFile(sourceFile)
+	markdownToHTML := blackfriday.MarkdownCommon(sourceFileRead)
+	return string(bluemonday.UGCPolicy().SanitizeBytes(github_flavored_markdown.Markdown(markdownToHTML))[:])
+}
+
 // GenerateHTML takes in a Markdown file and generates an HTML file
 func GenerateHTML(sourceFile string) string {
 	htmlHeader := `
@@ -62,8 +69,5 @@ func GenerateHTML(sourceFile string) string {
 </html>
   `
 
-	sourceFileRead, _ := ioutil.ReadFile(sourceFile)
-	markdownToHTML := blackfriday.MarkdownCommon(sourceFileRead)
-	htmlFromMarkdown := separateSlides(string(bluemonday.UGCPolicy().SanitizeBytes(github_flavored_markdown.Markdown(markdownToHTML))[:]))
-	return htmlHeader + customhtmlCSSstyle + htmlFromMarkdown + htmlFooter
+	return htmlHeader + customhtmlCSSstyle + separateSlides(HTMLFromMarkdown(sourceFile)) + htmlFooter
 }

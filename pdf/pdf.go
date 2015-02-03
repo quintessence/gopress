@@ -1,0 +1,26 @@
+package pdf
+
+import (
+	"strings"
+
+	"code.google.com/p/gofpdf"
+	"github.com/qanx/gopress/mdhtml"
+)
+
+func createPDFPageArray(file string) []string {
+	return strings.SplitAfter(mdhtml.HTMLFromMarkdown(file), "<hr/>")
+}
+
+func makePDF(file string, output string) {
+	htmlPDFarray := createPDFPageArray(file)
+	pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf.SetFont("Helvetica", "", 20)
+	_, lineHt := pdf.GetFontSize()
+	html := pdf.HTMLBasicNew()
+	for _, page := range htmlPDFarray {
+		pdf.AddPage()
+		html.Write(lineHt, page)
+	}
+	pdf.OutputFileAndClose(output)
+	//pdf.OutputAndClose(docWriter(pdf, 6))
+}

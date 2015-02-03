@@ -33,12 +33,15 @@ func main() {
 	flag.Parse()
 	logger.Info("Starting gopress")
 
-	if cssDir == "NULL" {
+	if cssDir == "NULL" && allTheFiles {
 		cssDir = sourceFilePath
+	} else if cssDir == "NULL" {
+		cssDir = filepath.Dir(sourceFilePath)
 	}
 
 	destinationDir = filemanager.ReplaceTildaWithHomeDir(destinationDir)
 	cssDir = filemanager.ReplaceTildaWithHomeDir(cssDir)
+
 	/*
 		if filemanager.DoesNotExist(sourceFilePath) {
 			logger.Errorf("Input file or directory does not exist: %s", sourceFilePath)
@@ -136,6 +139,7 @@ func main() {
 		}
 
 		outputFile := destinationDir + "/" + filemanager.ExtractFilename(file) + ".html"
+		//pdfFile := destinationDir + "/" + filemanager.ExtractFilename(file) + ".pdf"
 		htmlFile, errorCreatingFile := os.Create(outputFile)
 		if errorCreatingFile != nil {
 			logger.Errorf("Could not create file: %s", outputFile)
@@ -145,7 +149,6 @@ func main() {
 
 		//Convert Markdown to HTML
 		htmlContents := mdhtml.GenerateHTML(file)
-
 		//Locate image paths specified in HTML
 		findImagePaths := regexp.MustCompile("image(s)?.*(.(?i)(jp(e)?g|png|gif|bmp|tiff))")
 		imagesToCopy := findImagePaths.FindAllString(htmlContents, -1)
