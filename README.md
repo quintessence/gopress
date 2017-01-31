@@ -9,7 +9,7 @@ Go app inspired by [mdpress](https://github.com/egonSchiele/mdpress) - converts 
 Quick and easy installation:
 
 ```
-go install github.com/qanx/gopress
+go install github.com/quintessence/gopress
 ```
 
 You will also need the `cssJS.tar` file (do **not** rename this file). There are a few different ways to do this:
@@ -17,7 +17,7 @@ You will also need the `cssJS.tar` file (do **not** rename this file). There are
 **Via the command line**
 
 ```
-wget https://github.com/qanx/gopress/raw/master/cssJS.tar
+wget https://github.com/quintessence/gopress/raw/master/cssJS.tar
 ```
 
 Mac users: If you do not already have `wget`, please run:
